@@ -35,7 +35,9 @@ src/
 
 ## 2. Modélisation UML & Contrats d'Interface
 
-Pour éviter que chacun ne crée ses propres versions des modèles de données et des signatures de méthodes, voici la spécification commune et le diagramme de classes UML à respecter obligatoirement sur toutes les branches.
+Pour travailler sereinement en équipe, nous avons besoin de la modélisation UML du travail pour avoir une vue plus claire de ce qu'il y aura lieu de faire. Sinon chacun travaillera avec ce qu'il aura créé de son côté et ce ne sera pas évident.
+
+Voici donc le diagramme de classes et le diagramme de composants à respecter obligatoirement sur toutes les branches.
 
 ### Diagramme de Classes UML (Mermaid)
 
