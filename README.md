@@ -145,3 +145,26 @@ graph TD
     Animation --> Panels
     Animation --> Exception
 ```
+
+### Spécification des Attributs et Comportements
+
+#### A. Les Modèles (core/model)
+*   **`Trajet`** : Identifie le train (ex: Yaoundé -> Douala, départ à 14h30, tarif de base 5000 FCFA).
+*   **`Siege`** : Représente un siège avec son numéro, sa catégorie (`VIP` avec supplément de 3000 FCFA, `PREMIUM` avec supplément de 1000 FCFA, ou `CLASSIQUE` sans supplément), et son état de disponibilité.
+*   **`Billet`** : Contient la référence unique générée automatiquement (ex: `CR-YDE-DLA-12345`), le nom et la CNI du passager, le trajet, le siège, et le prix final calculé (`tarifDeBase + supplement`).
+
+#### B. La Persistance (persistance/dao et exception)
+*   **`IBilletDAO`** : Interface commune. L'implémentation `BilletDAOImpl` doit sauvegarder et lire les billets dans un fichier texte structuré (`billets.txt` ou `billets.csv`).
+*   **`ImpressionException`** : Exception levée lors d'une défaillance matérielle simulée (ex: `"BOURRAGE_PAPIER"`, `"ENCRE_INSUFFISANTE"`).
+
+#### C. Les Services Métier (core/service)
+*   **`ReservationService`** : Centralise la logique métier. C'est ici que l'on vérifie la disponibilité du siège avant de l'attribuer et que l'on fait appel au DAO pour persister la vente.
+
+#### D. Les Écrans Swing (ihm/panels et components)
+L'interface graphique est gérée par un `CardLayout` contenant les 3 écrans de l'assistant de vente :
+1.  **Écran 1 (Sélection)** : Recherche du trajet et choix du siège sur un plan de wagon interactif.
+2.  **Écran 2 (Confirmation)** : Saisie des informations du passager (Nom, CNI) et récapitulatif du prix.
+3.  **Écran 3 (Impression)** : Simulation visuelle de l'impression physique du billet avec une jauge de progression.
+
+#### E. L'Asynchronisme (thread/animation)
+*   **`ImpressionWorker` (SwingWorker)** : Simule l'impression sur un thread d'arrière-plan pendant 3 à 5 secondes. Il met à jour la barre de progression sur l'IHM et peut aléatoirement lever une `ImpressionException` pour simuler un incident technique (bourrage papier).
