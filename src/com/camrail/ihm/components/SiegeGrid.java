@@ -177,18 +177,18 @@ public class SiegeGrid extends JPanel {
      * Starts lower to avoid "too high" placement.
      */
     private Rectangle2D.Double getSeatBounds(int row, int col, int w, int h) {
-        int seatW = 38;
-        int seatH = 34;
-        int spacingX = 12;
-        int spacingY = 10;
-        int aisleW = 30;
+        int seatW = 34;
+        int seatH = 26;
+        int spacingX = 10;
+        int spacingY = 5;
+        int aisleW = 24;
         
         // Total width of the grid of 4 columns (2 groups of 2 separated by aisle)
         int totalGridW = (seatW * 4) + (spacingX * 2) + aisleW;
         int startX = (w - totalGridW) / 2;
         
         // Offset Y position to start lower down the wagon
-        int startY = 110; 
+        int startY = 90; 
         
         // Calculate X based on column groups
         int x = startX;
@@ -231,9 +231,9 @@ public class SiegeGrid extends JPanel {
         
         // 1. Draw Wagon Container (Minimalist, clean, structured)
         int wagonX = 35;
-        int wagonY = 65;
+        int wagonY = 55;
         int wagonW = w - 70;
-        int wagonH = h - 85;
+        int wagonH = h - 70;
         
         // Wagon body backdrop (Solid, high-quality translucent panel)
         g2.setColor(Theme.BG_GLASS);

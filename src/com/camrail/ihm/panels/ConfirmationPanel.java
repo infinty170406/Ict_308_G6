@@ -16,7 +16,7 @@ public class ConfirmationPanel extends JPanel {
     private MainFrame parent;
     private JTextField nomField;
     private JTextField cniField;
-    private JTextArea recapArea;
+    private HolographicRecap recapPanel;
     private QRCodePanel qrCodePanel;
     private JButton btnBack;
     private JButton btnConfirm;
@@ -33,29 +33,16 @@ public class ConfirmationPanel extends JPanel {
     }
     
     private void initComponents() {
-        // Passenger Name field
         nomField = createCyberTextField();
-        // CNI field
         cniField = createCyberTextField();
         
-        // QR Code Preview panel
         qrCodePanel = new QRCodePanel();
+        recapPanel = new HolographicRecap();
         
-        // Ticket Recap Area
-        recapArea = new JTextArea();
-        recapArea.setEditable(false);
-        recapArea.setFont(new Font("Monospaced", Font.BOLD, 12));
-        recapArea.setBackground(new Color(12, 12, 24));
-        recapArea.setForeground(Theme.NEON_CYAN);
-        recapArea.setCaretColor(Theme.NEON_CYAN);
-        recapArea.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        
-        // Price Badge
         prixLabel = new JLabel("", JLabel.CENTER);
         prixLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         prixLabel.setForeground(Theme.NEON_PINK);
         
-        // Buttons
         btnBack = new CustomButton("← RETOUR", new Color(100, 100, 115));
         btnConfirm = new CustomButton("💳 TRANSACT ET PAYER", Theme.NEON_BLUE);
         btnCancel = new CustomButton("✕ ANNULER", Theme.NEON_PINK);
@@ -66,30 +53,30 @@ public class ConfirmationPanel extends JPanel {
     }
     
     private JTextField createCyberTextField() {
-        JTextField field = new JTextField(15);
-        field.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        field.setBackground(new Color(15, 15, 30));
+        JTextField field = new JTextField();
+        field.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        field.setBackground(new Color(12, 12, 24));
         field.setForeground(Color.WHITE);
         field.setCaretColor(Theme.NEON_CYAN);
+        field.setPreferredSize(new Dimension(280, 42));
         field.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(0, 240, 255, 60), 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
+            BorderFactory.createEmptyBorder(10, 14, 10, 14)
         ));
         
-        // Glow effect on focus
         field.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 field.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(Theme.NEON_CYAN, 2),
-                    BorderFactory.createEmptyBorder(7, 11, 7, 11)
+                    BorderFactory.createEmptyBorder(9, 13, 9, 13)
                 ));
             }
             @Override
             public void focusLost(FocusEvent e) {
                 field.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(0, 240, 255, 60), 1),
-                    BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                    BorderFactory.createEmptyBorder(10, 14, 10, 14)
                 ));
             }
         });
@@ -125,11 +112,11 @@ public class ConfirmationPanel extends JPanel {
         // Center Split
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setOpaque(false);
-        splitPane.setResizeWeight(0.4);
+        splitPane.setResizeWeight(0.42);
         splitPane.setDividerLocation(420);
         splitPane.setBorder(null);
         
-        // Left Panel - Passenger Biometrics inputs
+        // Left Panel - Passenger Biometrics inputs (Stacked Layout)
         JPanel leftPanel = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -140,48 +127,55 @@ public class ConfirmationPanel extends JPanel {
             }
         };
         leftPanel.setOpaque(false);
-        leftPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
         
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(6, 0, 6, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
         
         // Large Biometric Fingerprint/Identity icon
         JLabel iconLabel = new JLabel("👤", JLabel.CENTER);
-        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 64));
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 56));
         iconLabel.setForeground(Theme.NEON_CYAN);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
         leftPanel.add(iconLabel, gbc);
         
-        // Input Labels
-        JLabel nomLbl = new JLabel("NOM DU PASSAGER :");
-        nomLbl.setFont(new Font("Monospaced", Font.BOLD, 12));
-        nomLbl.setForeground(Theme.TEXT_LIGHT);
+        // Form Title
+        JLabel formTitle = new JLabel("ENREGISTREMENT PASSAGER", JLabel.CENTER);
+        formTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        formTitle.setForeground(Theme.NEON_CYAN);
         gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
+        leftPanel.add(formTitle, gbc);
+        
+        // Vertical spacer
+        gbc.gridy = 2;
+        leftPanel.add(Box.createVerticalStrut(10), gbc);
+        
+        // Nom Field
+        JLabel nomLbl = new JLabel("👤 NOM COMPLET DU PASSAGER");
+        nomLbl.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        nomLbl.setForeground(Theme.TEXT_MUTED);
+        gbc.gridy = 3;
         leftPanel.add(nomLbl, gbc);
         
-        gbc.gridx = 1;
+        gbc.gridy = 4;
         leftPanel.add(nomField, gbc);
         
-        JLabel cniLbl = new JLabel("NUMÉRO CNI :");
-        cniLbl.setFont(new Font("Monospaced", Font.BOLD, 12));
-        cniLbl.setForeground(Theme.TEXT_LIGHT);
-        gbc.gridy = 2;
-        gbc.gridx = 0;
+        // CNI Field
+        JLabel cniLbl = new JLabel("🪪 NUMÉRO D'IDENTIFICATION CNI");
+        cniLbl.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        cniLbl.setForeground(Theme.TEXT_MUTED);
+        gbc.gridy = 5;
         leftPanel.add(cniLbl, gbc);
         
-        gbc.gridx = 1;
+        gbc.gridy = 6;
         leftPanel.add(cniField, gbc);
         
         // Vertical spacer
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.gridx = 0;
-        leftPanel.add(Box.createVerticalStrut(25), gbc);
+        gbc.gridy = 7;
+        leftPanel.add(Box.createVerticalStrut(15), gbc);
         
         // Price Badge Card inside left pane
         JPanel priceContainer = new JPanel(new BorderLayout()) {
@@ -194,10 +188,10 @@ public class ConfirmationPanel extends JPanel {
             }
         };
         priceContainer.setOpaque(false);
-        priceContainer.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        priceContainer.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         priceContainer.add(prixLabel, BorderLayout.CENTER);
         
-        gbc.gridy = 4;
+        gbc.gridy = 8;
         leftPanel.add(priceContainer, gbc);
         
         // Right Panel - Holographic Ticket Boarding Pass
@@ -209,30 +203,24 @@ public class ConfirmationPanel extends JPanel {
                 Theme.drawNeonBorder(g2, 0, 0, getWidth(), getHeight(), 20, Theme.NEON_PURPLE, Theme.NEON_CYAN);
                 
                 // Holographic design lines
-                g2.setColor(new Color(0, 240, 255, 20));
-                g2.setStroke(new BasicStroke(1.0f));
-                for (int y = 30; y < getHeight(); y += 40) {
+                g2.setColor(new Color(0, 240, 255, 15));
+                g2.setStroke(Theme.STROKE_1);
+                for (int y = 30; y < getHeight(); y += 45) {
                     g2.drawLine(20, y, getWidth() - 20, y);
                 }
                 g2.dispose();
             }
         };
         rightPanel.setOpaque(false);
-        rightPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        // ScrollPane for text
-        JScrollPane scrollPane = new JScrollPane(recapArea);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(189, 0, 255, 60), 2));
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
         
         // Place QR Code and details together in right pane
-        JPanel ticketContent = new JPanel(new BorderLayout(10, 0));
+        JPanel ticketContent = new JPanel(new BorderLayout(15, 0));
         ticketContent.setOpaque(false);
-        ticketContent.add(scrollPane, BorderLayout.CENTER);
+        ticketContent.add(recapPanel, BorderLayout.CENTER);
         
         // Wrap QR Panel in container to align it nicely
-        JPanel qrContainer = new JPanel(new BorderLayout());
+        JPanel qrContainer = new JPanel(new BorderLayout(0, 8));
         qrContainer.setOpaque(false);
         qrContainer.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         
@@ -269,39 +257,20 @@ public class ConfirmationPanel extends JPanel {
     }
     
     public void updateDisplay() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("================================================\n");
-        sb.append("      PROTOCOLE DE VOYAGE DÉCRYPTÉ // RESUMÉ    \n");
-        sb.append("================================================\n\n");
-        
         Object trajet = parent.getSelectedTrajet();
-        if (trajet != null) {
-            sb.append("📍 TRANSIT DIRECT:\n");
-            sb.append("   ").append(trajet.toString()).append("\n\n");
-        }
+        String route = trajet != null ? trajet.toString() : "Douala ➔ Yaoundé";
         
         Object siege = parent.getSelectedSiege();
-        if (siege != null) {
-            sb.append("💺 POSITION CABINE:\n");
-            sb.append("   ").append(siege.toString()).append("\n\n");
-        }
+        String seat = siege != null ? siege.toString() : "Siège 00 (Classique)";
         
         double prix = parent.getPrixTotal();
-        sb.append("💸 CREDITS TRANSIT:\n");
-        sb.append("   Tarif Base:  ").append(String.format("%,.0f", prix)).append(" CFA\n");
-        sb.append("   Surcharge:   ").append(String.format("%,.0f", prix * 0.15)).append(" CFA\n");
-        sb.append("   ─────────────────────────────────────\n");
-        sb.append("   TOTAL FINAL: ").append(String.format("%,.0f", prix * 1.15)).append(" CFA\n\n");
-        sb.append("================================================\n");
-        sb.append("⚡ ENREGISTREZ VOTRE IDENTITÉ BIOMÉTRIQUE\n");
-        sb.append("================================================\n");
         
-        recapArea.setText(sb.toString());
-        prixLabel.setText("CREDITS: " + String.format("%,.0f", prix * 1.15) + " CFA");
+        recapPanel.setData(route, seat, prix);
+        prixLabel.setText("CREDITS REQUIS: " + String.format("%,.0f", prix * 1.15) + " CFA");
         
         nomField.setText("");
         cniField.setText("");
-        qrCodePanel.generateNewPattern(); // Refresh fake QR Code pattern
+        qrCodePanel.generateNewPattern(); 
     }
     
     private void validateAndConfirm() {
@@ -326,7 +295,7 @@ public class ConfirmationPanel extends JPanel {
             return;
         }
         
-        // Random payment refusal exception (5% chance)
+        // Random bank rejection (5% chance)
         if (Math.random() < 0.05) {
             JOptionPane.showMessageDialog(this,
                 "❌ TRANSACTION REFUSÉE PAR LE RÉSEAU BANCAIRE.\n" +
@@ -337,33 +306,107 @@ public class ConfirmationPanel extends JPanel {
             return;
         }
         
+        // 1. Instancier les objets métier du backend
+        com.camrail.core.model.Trajet trajetModel = null;
+        if (parent.getSelectedTrajet() instanceof com.camrail.core.model.Trajet) {
+            trajetModel = (com.camrail.core.model.Trajet) parent.getSelectedTrajet();
+        } else {
+            // Reconstitution dynamique à partir de la sélection de l'IHM
+            String depart = "Douala";
+            String arrivee = "Yaoundé";
+            String heure = "07:00";
+            double prixBase = 5000;
+            int dureeMin = 240;
+            
+            Object t = parent.getSelectedTrajet();
+            if (t != null) {
+                try {
+                    java.lang.reflect.Method getDepart = t.getClass().getMethod("getDepart");
+                    java.lang.reflect.Method getArrivee = t.getClass().getMethod("getArrivee");
+                    java.lang.reflect.Method getHeure = t.getClass().getMethod("getHeure");
+                    java.lang.reflect.Method getDuree = t.getClass().getMethod("getDuree");
+                    java.lang.reflect.Method getPrix = t.getClass().getMethod("getPrix");
+                    
+                    depart = (String) getDepart.invoke(t);
+                    arrivee = (String) getArrivee.invoke(t);
+                    heure = (String) getHeure.invoke(t);
+                    prixBase = (Double) getPrix.invoke(t);
+                    
+                    String durStr = (String) getDuree.invoke(t);
+                    if (durStr != null && durStr.contains("h")) {
+                        String[] parts = durStr.split("h");
+                        int h = Integer.parseInt(parts[0].trim());
+                        int m = parts.length > 1 && !parts[1].trim().isEmpty() ? Integer.parseInt(parts[1].trim()) : 0;
+                        dureeMin = h * 60 + m;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            trajetModel = new com.camrail.core.model.Trajet(depart, arrivee, heure, prixBase, dureeMin);
+        }
+        
+        com.camrail.core.model.ClasseVoyage classeModel = com.camrail.core.model.ClasseVoyage.ECONOMIQUE;
+        String clStr = parent.getSelectionPanel().getSelectedClasse();
+        if (clStr != null) {
+            if (clStr.contains("Prem") || clStr.contains("1")) {
+                classeModel = com.camrail.core.model.ClasseVoyage.PREMIERE;
+            } else if (clStr.contains("Bus")) {
+                classeModel = com.camrail.core.model.ClasseVoyage.BUSINESS;
+            }
+        }
+        
+        int seatNum = 22;
+        if (parent.getSelectedSiege() != null) {
+            try {
+                if (parent.getSelectedSiege() instanceof Integer) {
+                    seatNum = (Integer) parent.getSelectedSiege();
+                } else {
+                    String sStr = parent.getSelectedSiege().toString().replaceAll("[^0-9]", "");
+                    if (!sStr.isEmpty()) {
+                        seatNum = Integer.parseInt(sStr);
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        com.camrail.core.model.Siege siegeModel = new com.camrail.core.model.Siege(seatNum, classeModel);
+        
+        com.camrail.core.model.Reservation reservation = new com.camrail.core.model.Reservation(trajetModel, siegeModel, nom);
+        reservation.setTelephone(cni); // Stocke la CNI dans le champ téléphone ou passager
+        reservation.validerPaiement();
+        
+        // 2. Persistance : sauvegarde sérialisée du ticket et BD SQLite
+        try {
+            com.camrail.persistance.dao.DataAccess.getInstance().sauvegarder(reservation);
+            com.camrail.persistance.dao.DatabaseAccess.getInstance().sauvegarder(reservation);
+        } catch (com.camrail.persistance.exception.PersistanceException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "⚠️ Données de sauvegarde hors ligne utilisées.",
+                "Notification Persistance",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+        // 3. Écriture physique du ticket sur disque (.txt dans tickets/)
+        try {
+            com.camrail.persistance.TicketWriter.genererTicket(reservation);
+        } catch (com.camrail.persistance.exception.TicketException ex) {
+            ex.printStackTrace();
+        }
+        
+        // 4. Mettre à jour l'état de l'application
         parent.setNomPassager(nom);
         parent.setCniPassager(cni);
+        parent.setTicketNumber(reservation.getNumeroTicket());
         
-        String ticketNumber = genererTicketId();
-        String codeSecurite = genererCodeSecurite();
-        parent.setTicketNumber(ticketNumber);
+        // Code sécurité généré de style AZE-789-XYZ
+        String codeSecurite = com.camrail.core.util.GenerateurCode.genererCodeSecurite();
         parent.setCodeSecurite(codeSecurite);
         
         parent.showPanel("IMPRESSION");
         parent.getImpressionPanel().startImpression();
-    }
-    
-    private String genererTicketId() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String date = sdf.format(new Date());
-        String random = String.format("%06d", new Random().nextInt(999999));
-        return "CAM-" + date + "-" + random;
-    }
-    
-    private String genererCodeSecurite() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder code = new StringBuilder();
-        Random random = new Random();
-        for (int i = 0; i < 8; i++) {
-            code.append(chars.charAt(random.nextInt(chars.length())));
-        }
-        return code.toString();
     }
     
     private void confirmExit() {
@@ -378,11 +421,92 @@ public class ConfirmationPanel extends JPanel {
         }
     }
 
-    // A panel that draws a real looking fake QR Code
+    // High fidelity glassmorphic ticket details display
+    private static class HolographicRecap extends JPanel {
+        private String route = "Douala ➔ Yaoundé";
+        private String seat = "Siège 23 (CLASSIQUE)";
+        private double basePrice = 7500;
+        private double surcharge = 1125;
+        private double total = 8625;
+        
+        public HolographicRecap() {
+            setOpaque(false);
+            setPreferredSize(new Dimension(280, 240));
+        }
+        
+        public void setData(String route, String seat, double price) {
+            this.route = route != null ? route : "Non spécifié";
+            this.seat = seat != null ? seat : "Non spécifié";
+            this.basePrice = price;
+            this.surcharge = price * 0.15;
+            this.total = price * 1.15;
+            repaint();
+        }
+        
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            Theme.applyQualityRendering(g2);
+            
+            int w = getWidth();
+            int h = getHeight();
+            
+            // Draw glass inner panel
+            Theme.drawGlassPanel(g2, 0, 0, w, h, 16);
+            Theme.drawNeonBorder(g2, 0, 0, w, h, 16, Theme.NEON_PURPLE, Theme.NEON_CYAN);
+            
+            // Header
+            g2.setFont(new Font("Monospaced", Font.BOLD, 11));
+            g2.setColor(Theme.NEON_CYAN);
+            g2.drawString("RECAPITULATIF DE SECURITE //", 18, 30);
+            
+            // Route section
+            g2.setFont(new Font("Segoe UI", Font.BOLD, 10));
+            g2.setColor(Theme.TEXT_MUTED);
+            g2.drawString("📍 TRAJET SELECTIONNE", 18, 55);
+            
+            g2.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            g2.setColor(Color.WHITE);
+            g2.drawString(route, 18, 73);
+            
+            // Seat section
+            g2.setFont(new Font("Segoe UI", Font.BOLD, 10));
+            g2.setColor(Theme.TEXT_MUTED);
+            g2.drawString("💺 CABINE & SELECTION", 18, 103);
+            
+            g2.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            g2.setColor(Theme.NEON_CYAN);
+            g2.drawString(seat, 18, 121);
+            
+            // Billing section
+            g2.setFont(new Font("Segoe UI", Font.BOLD, 10));
+            g2.setColor(Theme.TEXT_MUTED);
+            g2.drawString("💳 ALLOCATION DE CREDITS", 18, 152);
+            
+            g2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            g2.setColor(Theme.TEXT_LIGHT);
+            g2.drawString(String.format("Tarif Base :  %,.0f CFA", basePrice), 18, 172);
+            g2.drawString(String.format("Surcharge (15%%) : %,.0f CFA", surcharge), 18, 190);
+            
+            // Thin cyan separator
+            g2.setStroke(Theme.STROKE_1);
+            g2.setColor(Theme.getGlowColor(Theme.NEON_CYAN, 40));
+            g2.drawLine(18, 202, w - 18, 202);
+            
+            // Total price
+            g2.setFont(new Font("Segoe UI", Font.BOLD, 15));
+            g2.setColor(Theme.NEON_PINK);
+            g2.drawString(String.format("TOTAL TRANSIT : %,.0f CFA", total), 18, 222);
+            
+            g2.dispose();
+        }
+    }
+
     private static class QRCodePanel extends JPanel {
         private boolean[][] qrMatrix = new boolean[21][21];
         private Random rand = new Random();
-
+ 
         public QRCodePanel() {
             setPreferredSize(new Dimension(100, 100));
             setMinimumSize(new Dimension(100, 100));
@@ -390,33 +514,29 @@ public class ConfirmationPanel extends JPanel {
             setOpaque(false);
             generateNewPattern();
         }
-
+ 
         public void generateNewPattern() {
-            // Generate random QR pixels
             for (int r = 0; r < 21; r++) {
                 for (int c = 0; c < 21; c++) {
                     qrMatrix[r][c] = rand.nextBoolean();
                 }
             }
-            
-            // Draw standard 3 corner alignment patterns
             drawSquarePattern(0, 0);
             drawSquarePattern(14, 0);
             drawSquarePattern(0, 14);
             repaint();
         }
-
+ 
         private void drawSquarePattern(int r, int c) {
             for (int i = 0; i < 7; i++) {
                 for (int j = 0; j < 7; j++) {
-                    // Border of alignment mark
                     boolean isBorder = (i == 0 || i == 6 || j == 0 || j == 6);
                     boolean isCenter = (i >= 2 && i <= 4 && j >= 2 && j <= 4);
                     qrMatrix[r + i][c + j] = isBorder || isCenter;
                 }
             }
         }
-
+ 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -428,11 +548,9 @@ public class ConfirmationPanel extends JPanel {
             int startX = (getWidth() - size) / 2;
             int startY = (getHeight() - size) / 2;
             
-            // Draw white background card for QR Code
             g2.setColor(Color.WHITE);
             g2.fillRoundRect(startX - 4, startY - 4, size + 8, size + 8, 8, 8);
             
-            // Draw pixels
             g2.setColor(Color.BLACK);
             for (int r = 0; r < 21; r++) {
                 for (int c = 0; c < 21; c++) {

@@ -353,4 +353,8 @@ public class SelectionPanel extends JPanel {
         networkMap.setActiveRoute("", "");
         // timeline is updated dynamically
     }
+    
+    public String getSelectedClasse() {
+        return selectedClass;
+    }
 }

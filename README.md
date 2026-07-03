@@ -1,68 +1,74 @@
-# Guide d'Architecture Technique et README
-
-## Projet 6 : Système de Vente et d'Impression de Billets (Camrail Intercity) - Examen ICT308
-
----
-
-### Objectif du Document
-Structurer le travail pour l'équipe de 10 personnes afin d'éviter les conflits de code, définir précisément le rôle de chaque sous-groupe et garantir une architecture logicielle propre et modulaire (MVC) respectant scrupuleusement le cahier des charges.
+# 🚄 CAMRAIL INTERCITY - EXAMEN ICT308 (Groupe 6)
+## Guide d'Architecture Unifiée, Spécifications et Utilisation du Système
 
 ---
 
-## 1. Architecture Générale du Projet (Modèle-Vue-Contrôleur)
+## 🌌 1. Présentation & Rôle de Chaque Composant Unifié
 
-Afin de s'assurer que les développements des 10 membres s'assemblent sans friction, le projet adoptera une architecture standardisée découpée en packages stricts. Aucun code de l'IHM ne doit manipuler directement les fichiers, et aucune classe métier ne doit instancier de composant Swing.
+Ce projet est la fusion de trois sous-systèmes distincts développés par l'équipe pour construire l'application finale **Camrail Intercity (Cyberpunk 2035 Edition)**. Voici ce que chaque composant a apporté au système :
 
-```text
-src/
-└── com/
-    └── camrail/
-        ├── Main.java                        # Point d'entrée de l'application
-        ├── core/                            # Équipe 1 : Métier & Logique
-        │   ├── model/                       # Classes de données (Trajet, Siege, Billet)
-        │   └── service/                     # Algorithmes de gestion et de validation
-        ├── persistance/                     # Équipe 2 : Fichiers & Exception
-        │   ├── dao/                         # Interface et implémentation d'écriture
-        │   └── exception/                   # Exceptions matérielles simulées
-        ├── ihm/                             # Équipe 3 : Interface Swing
-        │   ├── components/                  # Éléments réutilisables (Boutons, Tables)
-        │   └── panels/                      # Assistant Écran 1, 2, 3 géré par CardLayout
-        └── thread/                          # Équipe 4 : Multithreading & Async
-            └── animation/                   # SwingWorker, Simulateur d'Impression
+### 💎 A. Le Module Métier ("Elsa") — *core/model* & *core/service*
+Il constitue le cœur logique et les contrats métier de l'application :
+* **Modèles Métier** :
+  * `Trajet` : Modélise les liaisons ferroviaires, heures de départ, durées et calcule les prix HT, TVA (19.25%) et TTC.
+  * `Siege` : Modélise l'entité réservable avec ses différents niveaux de confort (`ClasseVoyage`).
+  * `Reservation` : Agrège un trajet, un siège et un passager. Elle génère le format de ticket final et gère l'état du paiement.
+* **Contrats d'Interfaces** :
+  * `ITicketable` : Contrat standardisé pour tout objet imprimable sous forme de ticket.
+  * `ITarifiable` : Méthodes de calcul pour les prix HT, TTC et la TVA.
+  * `IReservable` : Méthodes de contrôle des transitions d'états d'une place.
+  * `IComparableParPrix` : Algorithmes de tri par valeur financière.
+* **Services** :
+  * `GestionReservations` : Gestionnaire en mémoire orchestrant les trajets et l'état des sièges au démarrage.
+
+### 💾 B. Le Module Persistance ("Dev_newSystem") — *persistance*
+Il fournit le squelette d'écriture et de gestion des sauvegardes physiques :
+* `TicketDAO` : Interface définissant les opérations d'accès aux données de réservation.
+* `DataAccess` : Classe de stockage qui utilise la sérialisation binaire Java (`.ser`) pour sauvegarder les objets de réservation.
+* `FileManager` : Gère la création des dossiers locaux de données et les flux d'entrées/sorties binarisées.
+* `TicketWriter` : Écrit la facture textuelle formatée du billet de train directement sur le disque.
+* `PersistanceException` & `TicketException` : Gestion d'erreurs d'écriture disque et d'accès.
+
+### 🎨 C. Le Module Graphique ("IHM") — *ihm*
+Il fournit l'expérience visuelle Cyberpunk premium, immersive et optimisée :
+* **Rendu Haute-Fidélité (Zero-CPU Idle)** : Structure optimisée limitant les repaint répétitifs, utilisant une mise en cache des textures et polices néon.
+* **Composants Dynamiques** :
+  * `WelcomePanel` : Écran d'accueil futuriste avec locomotive animée.
+  * `SelectionPanel` : Grille de sièges interactive (`SiegeGrid`) s'adaptant à la taille de l'écran, affichage interactif des trajets (`TrainTable`), et carte holographique des gares (`RailNetworkMap`).
+  * `ConfirmationPanel` : Saisie des données de voyage, vérification bancaire biométrique et récapitulatif translucide (Glassmorphism).
+  * `ImpressionPanel` : Processus d'impression asynchrone sécurisé avec jauge de progression.
+
+### 🗄️ D. La Couche Base de Données (SQLite JDBC)
+Nous avons implémenté une double persistance hybride via SQLite :
+* `DatabaseAccess` : Implémentation SQL du `TicketDAO` insérant les réservations dans `data/camrail.db`.
+* **Automatique** : Initialisation automatique de la base et de la table `reservations` sans configuration externe complexe requise.
+
+---
+
+## 🛠️ 2. Guide d'Utilisation et Commandes
+
+### 📋 Prérequis
+* **JDK 17** ou supérieur installé.
+* **Apache Maven** installé.
+
+### 🚀 Compilation
+Pour compiler le projet et télécharger les dépendances requises (notamment le pilote SQLite) :
+```bash
+mvn clean compile
+```
+
+### 🚄 Lancement de l'Application
+Pour démarrer l'IHM interactive unifiée de Camrail Intercity :
+```bash
+mvn exec:java
 ```
 
 ---
 
-## 2. Modélisation UML & Contrats d'Interface
+## 📂 3. Emplacement des Données Générées
 
-Pour éviter que chacun ne crée ses propres versions des modèles de données et des signatures de méthodes, voici la spécification commune et le diagramme de classes UML à respecter obligatoirement sur toutes les branches.
+Une fois qu'une réservation est validée dans l'application, les fichiers suivants sont créés dans le répertoire racine du projet :
 
-### Diagramme de Classes UML (Mermaid)
-voir image qui se trouve dans un dossier image 
-
-### Diagramme de Composants (Architecture de Flux)
-
-voir image qui se trouve dans un dossier image 
-
-### Spécification des Attributs et Comportements
-
-#### A. Les Modèles (core/model)
-*   **`Trajet`** : Identifie le train (ex: Yaoundé -> Douala, départ à 14h30, tarif de base 5000 FCFA).
-*   **`Siege`** : Représente un siège avec son numéro, sa catégorie (`VIP` avec supplément de 3000 FCFA, `PREMIUM` avec supplément de 1000 FCFA, ou `CLASSIQUE` sans supplément), et son état de disponibilité.
-*   **`Billet`** : Contient la référence unique générée automatiquement (ex: `CR-YDE-DLA-12345`), le nom et la CNI du passager, le trajet, le siège, et le prix final calculé (`tarifDeBase + supplement`).
-
-#### B. La Persistance (persistance/dao et exception)
-*   **`IBilletDAO`** : Interface commune. L'implémentation `BilletDAOImpl` doit sauvegarder et lire les billets dans un fichier texte structuré (`billets.txt` ou `billets.csv`).
-*   **`ImpressionException`** : Exception levée lors d'une défaillance matérielle simulée (ex: `"BOURRAGE_PAPIER"`, `"ENCRE_INSUFFISANTE"`).
-
-#### C. Les Services Métier (core/service)
-*   **`ReservationService`** : Centralise la logique métier. C'est ici que l'on vérifie la disponibilité du siège avant de l'attribuer et que l'on fait appel au DAO pour persister la vente.
-
-#### D. Les Écrans Swing (ihm/panels et components)
-L'interface graphique est gérée par un `CardLayout` contenant les 3 écrans de l'assistant de vente :
-1.  **Écran 1 (Sélection)** : Recherche du trajet et choix du siège sur un plan de wagon interactif.
-2.  **Écran 2 (Confirmation)** : Saisie des informations du passager (Nom, CNI) et récapitulatif du prix.
-3.  **Écran 3 (Impression)** : Simulation visuelle de l'impression physique du billet avec une jauge de progression.
-
-#### E. L'Asynchronisme (thread/animation)
-*   **`ImpressionWorker` (SwingWorker)** : Simule l'impression sur un thread d'arrière-plan pendant 3 à 5 secondes. Il met à jour la barre de progression sur l'IHM et peut aléatoirement lever une `ImpressionException` pour simuler un incident technique (bourrage papier).
+1. **`data/camrail.db`** : Base de données SQLite relationnelle contenant la table `reservations`.
+2. **`data/reservations.ser`** : Fichier de sauvegarde binaire sérialisé contenant la liste complète des objets `Reservation`.
+3. **`tickets/ticket_CAR-YYYYMMDD-[RAND].txt`** : Reçu d'embarquement formaté prêt à l'impression.
