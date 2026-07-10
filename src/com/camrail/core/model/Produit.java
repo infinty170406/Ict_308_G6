@@ -72,6 +72,17 @@ public abstract class Produit implements Serializable {
         return prixBase;
     }
 
+    /**
+     * Modifie le nom du produit
+     * 
+     * @param nom Nouveau nom du produit
+     */
+    public void setNom(String nom) {
+        if (nom != null && !nom.trim().isEmpty()) {
+            this.nom = nom.trim();
+        }
+    }
+
     // ===== MÉTHODES Object =====
 
     @Override

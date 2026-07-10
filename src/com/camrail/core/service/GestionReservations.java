@@ -42,18 +42,16 @@ public class GestionReservations implements Serializable {
      */
     private void initialiserDonnees() {
         // ===== TRAJETS DISPONIBLES =====
-        trajetsDisponibles.add(new Trajet("Yaoundé", "Douala", "08:00", 5000, 240));
-        trajetsDisponibles.add(new Trajet("Yaoundé", "Douala", "12:00", 5000, 240));
-        trajetsDisponibles.add(new Trajet("Yaoundé", "Douala", "18:00", 5000, 240));
-        trajetsDisponibles.add(new Trajet("Douala", "Yaoundé", "09:30", 5000, 240));
-        trajetsDisponibles.add(new Trajet("Douala", "Yaoundé", "14:00", 5000, 240));
-        trajetsDisponibles.add(new Trajet("Yaoundé", "Bafoussam", "07:00", 4000, 180));
-        trajetsDisponibles.add(new Trajet("Douala", "Bafoussam", "10:00", 4500, 200));
-        trajetsDisponibles.add(new Trajet("Bafoussam", "Douala", "13:00", 4500, 200));
-        trajetsDisponibles.add(new Trajet("Yaoundé", "Garoua", "06:00", 8000, 480));
-        trajetsDisponibles.add(new Trajet("Douala", "Garoua", "08:30", 8500, 420));
+        trajetsDisponibles.add(new Trajet("Yaoundé", "Douala", "06:30", 18000, 135));
+        trajetsDisponibles.add(new Trajet("Douala", "Yaoundé", "09:00", 18000, 135));
+        trajetsDisponibles.add(new Trajet("Yaoundé", "Ngaoundéré", "20:00", 32000, 660));
+        trajetsDisponibles.add(new Trajet("Ngaoundéré", "Yaoundé", "19:30", 32000, 645));
+        trajetsDisponibles.add(new Trajet("Douala", "Bafoussam", "08:15", 16000, 225));
+        trajetsDisponibles.add(new Trajet("Bafoussam", "Douala", "14:30", 16000, 225));
+        trajetsDisponibles.add(new Trajet("Yaoundé", "Kribi", "07:30", 12000, 180));
+        trajetsDisponibles.add(new Trajet("Kribi", "Yaoundé", "16:00", 12000, 180));
 
-        // ===== SIÈGES : 10 Première, 10 Business, 10 Économique =====
+        // ===== SIÈGES : 10 Première (1-10), 10 Business (11-20), 20 Économique (21-40) =====
         int num = 1;
         for (int i = 0; i < 10; i++) {
             siegeDisponibles.add(new Siege(num++, ClasseVoyage.PREMIERE));
@@ -61,7 +59,7 @@ public class GestionReservations implements Serializable {
         for (int i = 0; i < 10; i++) {
             siegeDisponibles.add(new Siege(num++, ClasseVoyage.BUSINESS));
         }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             siegeDisponibles.add(new Siege(num++, ClasseVoyage.ECONOMIQUE));
         }
     }
